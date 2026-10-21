@@ -1,0 +1,74 @@
+query GetHubWorkoutDetail($id: LessonId!, $withExerciseSwaps: Boolean! = false) {
+  lesson: lessonById(id: $id) {
+    id
+    name
+    description
+    duration
+    rpe
+    equipment {
+      name
+    }
+    sections(orderBy: DISPLAY_ORDER) {
+      ...LessonSectionFields
+    }
+  }
+}
+
+fragment SectionExerciseFields on SectionExercise {
+  id
+  description
+  duration
+  notes
+  rpe
+  weight
+  repetitions
+  distance
+  exercise {
+    id
+    name
+    alternativeExercises @include(if: $withExerciseSwaps) {
+      id
+      name
+    }
+  }
+  detailedMetrics {
+    distance { min max single }
+    repetitions { min max single }
+    weight { min max single }
+    calories { min max single }
+  }
+}
+
+fragment LessonSectionFields on LessonSection {
+  id
+  name
+  format
+  description
+  notes
+  duration
+  displayOrder
+  workTime
+  restTime
+  rounds
+  isMain
+  isRotational
+  sectionExercises(orderBy: DISPLAY_ORDER) {
+    ...SectionExerciseFields
+  }
+  sectionExerciseGroups(orderBy: DISPLAY_ORDER) {
+    id
+    name
+    showTitle
+    sectionExercises {
+      ...SectionExerciseFields
+    }
+    sectionExerciseGroups {
+      id
+      name
+      showTitle
+      sectionExercises {
+        ...SectionExerciseFields
+      }
+    }
+  }
+}
